@@ -1,7 +1,7 @@
 from django.test import TestCase
 from  django.urls import reverse 
 
-from .models import Menu
+from .models import Menu, Booking
 
 # Create your tests here.
 class HomePageTest(TestCase):
@@ -57,6 +57,42 @@ class MenuTests(TestCase):
     self.assertEqual(no_response.status_code, 404)
     self.assertTemplateUsed(response, "menu_item.html")
     self.assertContains(response, "<h1>Menu item</h1>")
+
+class BookingTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+      cls.booking = Booking.objects.create(
+        first_name = "John",
+        last_name = "Doe", 
+        guest_number = 5,
+        comment = "Test comment"
+      )
+    
+    def test_booking_model(self):
+      self.assertEqual(self.booking.first_name, "John")
+      self.assertEqual(self.booking.last_name, "Doe")
+      self.assertEqual(self.booking.guest_number, 5)
+      self.assertEqual(self.booking.comment, "Test comment")
+
+    def test_url_exists_at_correct_location(self):
+      response = self.client.get("/book/")
+      self.assertEqual(response.status_code, 200)
+    
+    def test_booking_formview(self):
+      response = self.client.post(
+        reverse("book"),
+        {
+          "first_name": "Mary",
+          "last_name": "Smith",
+          "guest_number": "12",
+          "comment": "Birthday party"
+        },
+      )
+      self.assertEqual(response.status_code, 302)
+      self.assertEqual(Booking.objects.last().first_name, "Mary")
+      self.assertEqual(Booking.objects.last().last_name, "Smith")
+      self.assertEqual(Booking.objects.last().guest_number, 12)
+      self.assertEqual(Booking.objects.last().comment, "Birthday party")
     
 
 
