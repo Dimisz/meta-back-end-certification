@@ -1,8 +1,9 @@
-from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic import TemplateView, ListView, DetailView, FormView
+from django.urls import reverse
 
 from .forms import BookingForm
 from .models import Menu
-# Create your views here.
+
 # Create your views here.
 class HomeView(TemplateView):
     template_name = "index.html"
@@ -10,9 +11,20 @@ class HomeView(TemplateView):
 class AboutView(TemplateView):
     template_name = "about.html"
 
-
-class BookingView(TemplateView):
+class BookingView(FormView):
+    form_class = BookingForm
     template_name = "book.html"
+
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        booking = form.save(commit=False)
+        booking.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("home")
 
 class MenuListView(ListView):
     model = Menu
