@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 
 from .forms import BookingForm
 from .models import Menu
@@ -13,6 +13,10 @@ class AboutView(TemplateView):
 
 class BookingView(TemplateView):
     template_name = "book.html"
+
+class MenuListView(ListView):
+    model = Menu
+    template_name = "menu.html"
 # def home(request):
 #     return render(request, 'index.html')
 
