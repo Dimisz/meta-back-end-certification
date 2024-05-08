@@ -34,19 +34,30 @@ class MenuTests(TestCase):
     self.assertEqual(self.menu.price, 10)
     self.assertEqual(self.menu.description, "Some description here")
     self.assertEqual(str(self.menu), "Falafel")
+    self.assertEqual(self.menu.get_absolute_url(), "/menu/1")
 
-  def test_url_exists_at_correct_location(self):
+  def test_url_exists_at_correct_location_listview(self):
     response = self.client.get("/menu/")
     self.assertEqual(response.status_code, 200)
-  
-  def test_url_available_by_name(self):
-    response = self.client.get(reverse("menu"))
+
+  def test_url_exists_at_correct_location_detailview(self):
+    response = self.client.get("/menu/1")
     self.assertEqual(response.status_code, 200)
   
-  def test_correct_template_used(self):
+  def test_menu_listview(self):
     response = self.client.get(reverse("menu"))
+    self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, "menu.html")
     self.assertContains(response, "<h1>Menu</h1>")
+
+  def test_menu_detailview(self):
+    response = self.client.get(reverse("menu_item", kwargs={"pk": self.menu.pk}))
+    no_response = self.client.get("/menu/1000")
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(no_response.status_code, 404)
+    self.assertTemplateUsed(response, "menu_item.html")
+    self.assertContains(response, "<h1>Menu item</h1>")
+    
 
 
   
